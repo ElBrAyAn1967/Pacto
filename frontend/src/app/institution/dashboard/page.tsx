@@ -1,46 +1,75 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Building2, Users, TrendingUp, DollarSign, Search, Filter, 
-  Download, ArrowUpRight, ArrowDownRight, MoreHorizontal, CheckCircle,
-  Clock, AlertCircle, CreditCard, BarChart3, PieChart, Activity
+  Download, ArrowUpRight, CheckCircle, Clock, AlertCircle, 
+  CreditCard, BarChart3, PieChart, Activity, Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { apiClient } from "@/lib/api";
 
-// Mock data for demo
-const mockPymes = [
-  { id: 1, name: "Distribuidora López S.A.", wallet: "0x742d...Cc66", score: 847, risk: "low", volume: 1200000, transactions: 47, status: "active" },
-  { id: 2, name: "Comercial García", wallet: "0x891a...23Bb", score: 723, risk: "low", volume: 850000, transactions: 32, status: "active" },
-  { id: 3, name: "Importadora Martínez", wallet: "0x123b...45Aa", score: 654, risk: "medium", volume: 650000, transactions: 28, status: "pending" },
-  { id: 4, name: "Servicios Técnicos Ruiz", wallet: "0x456c...78Dd", score: 589, risk: "medium", volume: 420000, transactions: 19, status: "active" },
-  { id: 5, name: "Construcciones Hernández", wallet: "0x789d...90Ee", score: 912, risk: "low", volume: 2100000, transactions: 89, status: "active" },
-];
+interface Pyme {
+  id: string;
+  name: string;
+  wallet: string;
+  score: number;
+  risk: 'low' | 'medium' | 'high';
+  volume: number;
+  transactions: number;
+  status: 'active' | 'pending';
+}
 
-const mockTransactions = [
-  { id: 1, pyme: "Distribuidora López S.A.", amount: 25000, type: "sale", status: "validated", date: "2026-05-15", counterparty: "Agrícola del Norte" },
-  { id: 2, pyme: "Comercial García", amount: 18000, type: "purchase", status: "pending", date: "2026-05-14", counterparty: "Mayoreo Central" },
-  { id: 3, pyme: "Importadora Martínez", amount: 45000, type: "sale", status: "validated", date: "2026-05-13", counterparty: "Distribuidora Sur" },
-  { id: 4, pyme: "Servicios Técnicos Ruiz", amount: 8500, type: "service", status: "validated", date: "2026-05-12", counterparty: "Industrias Unidas" },
-];
+interface InstitutionStats {
+  totalPymes: number;
+  activePymes: number;
+  totalVolume: number;
+  avgScore: number;
+  totalTransactions: number;
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+}
 
 export default function InstitutionDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
+  const [pymes, setPymes] = useState<Pyme[]>([]);
+  const [stats, setStats] = useState<InstitutionStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const filteredPymes = mockPymes.filter(p => 
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [pymesRes, statsRes] = await Promise.all([
+          apiClient.getInstitutionPymes(),
+          apiClient.getInstitutionStats()
+        ]);
+        
+        if (pymesRes.success) {
+          setPymes(pymesRes.data);
+        }
+        
+        if (statsRes.success) {
+          setStats(statsRes.data);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredPymes = pymes.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.wallet.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const stats = {
-    totalPymes: mockPymes.length,
-    activePymes: mockPymes.filter(p => p.status === "active").length,
-    totalVolume: mockPymes.reduce((acc, p) => acc + p.volume, 0),
-    avgScore: Math.round(mockPymes.reduce((acc, p) => acc + p.score, 0) / mockPymes.length),
-    totalTransactions: mockPymes.reduce((acc, p) => acc + p.transactions, 0),
-    lowRisk: mockPymes.filter(p => p.risk === "low").length,
-  };
 
   const getRiskColor = (risk: string) => {
     switch(risk) {
@@ -57,6 +86,35 @@ export default function InstitutionDashboard() {
     return "text-red-600";
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-avalanche-red mx-auto mb-4" />
+          <p className="text-slate-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-xl shadow-sm max-w-md">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 font-medium mb-2">Error loading dashboard</p>
+          <p className="text-slate-600 text-sm">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-avalanche-red text-white rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -72,9 +130,10 @@ export default function InstitutionDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button className="p-2 text-slate-400 hover:text-slate-600">
-                <AlertCircle className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                API Connected
+              </div>
               <div className="w-8 h-8 bg-avalanche-red rounded-full flex items-center justify-center text-white font-medium">
                 BS
               </div>
@@ -90,7 +149,6 @@ export default function InstitutionDashboard() {
             {[
               { id: "overview", label: "Overview", icon: Activity },
               { id: "pymes", label: "PYMEs", icon: Users },
-              { id: "transactions", label: "Transactions", icon: CreditCard },
               { id: "analytics", label: "Analytics", icon: BarChart3 },
             ].map((tab) => (
               <button
@@ -111,7 +169,7 @@ export default function InstitutionDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === "overview" && (
+        {activeTab === "overview" && stats && (
           <>
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -179,87 +237,55 @@ export default function InstitutionDashboard() {
               </div>
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* PYMEs Table */}
-              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200">
-                <div className="p-6 border-b border-slate-200">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-bold text-slate-900">Top PYMEs by Volume</h2>
-                    <Link href="#" className="text-avalanche-red hover:underline text-sm">
-                      View all
-                    </Link>
-                  </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-slate-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">PYME</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Score</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Risk</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Volume</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {mockPymes.slice(0, 5).map((pyme) => (
-                        <tr key={pyme.id} className="hover:bg-slate-50">
-                          <td className="px-6 py-4">
-                            <div>
-                              <p className="font-medium text-slate-900">{pyme.name}</p>
-                              <p className="text-sm text-slate-500 font-mono">{pyme.wallet}</p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`font-bold ${getScoreColor(pyme.score)}`}>
-                              {pyme.score}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full capitalize ${getRiskColor(pyme.risk)}`}>
-                              {pyme.risk}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-medium">
-                            ${pyme.volume.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            {/* PYMEs Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+              <div className="p-6 border-b border-slate-200">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold text-slate-900">Top PYMEs by Volume</h2>
+                  <button 
+                    onClick={() => setActiveTab("pymes")}
+                    className="text-avalanche-red hover:underline text-sm"
+                  >
+                    View all
+                  </button>
                 </div>
               </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-                <div className="p-6 border-b border-slate-200">
-                  <h2 className="text-lg font-bold text-slate-900">Recent Transactions</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {mockTransactions.map((tx) => (
-                      <div key={tx.id} className="flex items-start gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          tx.status === "validated" ? "bg-green-100" : "bg-yellow-100"
-                        }`}>
-                          {tx.status === "validated" ? (
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <Clock className="w-4 h-4 text-yellow-600" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-slate-900 text-sm">{tx.pyme}</p>
-                          <p className="text-xs text-slate-500">{tx.type} • {tx.date}</p>
-                        </div>
-                        <p className="font-medium text-slate-900">${tx.amount.toLocaleString()}</p>
-                      </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">PYME</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Score</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Risk</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Volume</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {pymes.slice(0, 5).map((pyme) => (
+                      <tr key={pyme.id} className="hover:bg-slate-50">
+                        <td className="px-6 py-4">
+                          <div>
+                            <p className="font-medium text-slate-900">{pyme.name}</p>
+                            <p className="text-sm text-slate-500 font-mono">{pyme.wallet}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`font-bold ${getScoreColor(pyme.score)}`}>
+                            {pyme.score}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full capitalize ${getRiskColor(pyme.risk)}`}>
+                            {pyme.risk}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium">
+                          ${pyme.volume.toLocaleString()}
+                        </td>
+                      </tr>
                     ))}
-                  </div>
-                  <Link href="#" className="block text-center text-avalanche-red hover:underline text-sm mt-6">
-                    View all transactions
-                  </Link>
-                </div>
+                  </tbody>
+                </table>
               </div>
             </div>
           </>
@@ -302,7 +328,6 @@ export default function InstitutionDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Risk</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Volume</th>
                     <th className="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Status</th>
-                    <th className="px-6 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
@@ -334,11 +359,6 @@ export default function InstitutionDashboard() {
                           {pyme.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <button className="p-1 hover:bg-slate-100 rounded">
-                          <MoreHorizontal className="w-5 h-5 text-slate-400" />
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -347,40 +367,7 @@ export default function InstitutionDashboard() {
           </div>
         )}
 
-        {activeTab === "transactions" && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Transaction History</h2>
-            <p className="text-slate-600">View and manage all transactions from your onboarded PYMEs.</p>
-            
-            <div className="mt-6 space-y-4">
-              {mockTransactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      tx.status === "validated" ? "bg-green-100" : "bg-yellow-100"
-                    }`}>
-                      {tx.status === "validated" ? (
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <Clock className="w-5 h-5 text-yellow-600" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900">{tx.pyme}</p>
-                      <p className="text-sm text-slate-500">{tx.type} with {tx.counterparty}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-slate-900">${tx.amount.toLocaleString()}</p>
-                    <p className="text-sm text-slate-500">{tx.date}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "analytics" && (
+        {activeTab === "analytics" && stats && (
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <h3 className="text-lg font-bold text-slate-900 mb-6">Risk Distribution</h3>
@@ -388,28 +375,28 @@ export default function InstitutionDashboard() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-600">Low Risk</span>
-                    <span className="font-medium">60%</span>
+                    <span className="font-medium">{Math.round((stats.lowRisk / stats.totalPymes) * 100)}%</span>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{width: '60%'}}></div>
+                    <div className="bg-green-500 h-2 rounded-full" style={{width: `${(stats.lowRisk / stats.totalPymes) * 100}%`}}></div>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-600">Medium Risk</span>
-                    <span className="font-medium">30%</span>
+                    <span className="font-medium">{Math.round((stats.mediumRisk / stats.totalPymes) * 100)}%</span>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div className="bg-yellow-500 h-2 rounded-full" style={{width: '30%'}}></div>
+                    <div className="bg-yellow-500 h-2 rounded-full" style={{width: `${(stats.mediumRisk / stats.totalPymes) * 100}%`}}></div>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-600">High Risk</span>
-                    <span className="font-medium">10%</span>
+                    <span className="font-medium">{Math.round((stats.highRisk / stats.totalPymes) * 100)}%</span>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div className="bg-red-500 h-2 rounded-full" style={{width: '10%'}}></div>
+                    <div className="bg-red-500 h-2 rounded-full" style={{width: `${(stats.highRisk / stats.totalPymes) * 100}%`}}></div>
                   </div>
                 </div>
               </div>
@@ -419,17 +406,18 @@ export default function InstitutionDashboard() {
               <h3 className="text-lg font-bold text-slate-900 mb-6">Score Distribution</h3>
               <div className="flex items-end justify-between h-40 gap-2">
                 {[
-                  { label: "500-600", value: 20 },
-                  { label: "600-700", value: 35 },
-                  { label: "700-800", value: 30 },
-                  { label: "800+", value: 15 },
+                  { label: "500-600", value: pymes.filter(p => p.score >= 500 && p.score < 600).length },
+                  { label: "600-700", value: pymes.filter(p => p.score >= 600 && p.score < 700).length },
+                  { label: "700-800", value: pymes.filter(p => p.score >= 700 && p.score < 800).length },
+                  { label: "800+", value: pymes.filter(p => p.score >= 800).length },
                 ].map((bar) => (
                   <div key={bar.label} className="flex-1 flex flex-col items-center">
                     <div 
-                      className="w-full bg-avalanche-red rounded-t"
-                      style={{height: `${bar.value * 2}px`}}
+                      className="w-full bg-avalanche-red rounded-t transition-all duration-500"
+                      style={{height: `${bar.value * 20}px`}}
                     ></div>
                     <p className="text-xs text-slate-500 mt-2 text-center">{bar.label}</p>
+                    <p className="text-xs font-bold text-slate-700">{bar.value}</p>
                   </div>
                 ))}
               </div>
