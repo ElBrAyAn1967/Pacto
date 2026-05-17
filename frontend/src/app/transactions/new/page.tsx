@@ -3,19 +3,25 @@
 import { useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
-import { ArrowLeft, FileText, AlertCircle } from "lucide-react";
+import { ArrowLeft, FileText, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useTransactions } from "@/hooks/useTransactions";
 
 export default function NewTransaction() {
   const { isConnected } = useAccount();
+  const { registerTransaction, isRegistering, contractAddress } = useTransactions();
+  
   const [formData, setFormData] = useState({
     counterparty: "",
     amount: "",
     currency: "MXN",
     description: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [txHash, setTxHash] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  const isContractDeployed = contractAddress && contractAddress !== "0x0000000000000000000000000000000000000000";
 
   if (!isConnected) {
     return (
@@ -33,13 +39,32 @@ export default function NewTransaction() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate blockchain transaction
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setSubmitted(true);
+    setError("");
+
+    if (!isContractDeployed) {
+      // Demo mode - simulate transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setTxHash("0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(""));
+      setSubmitted(true);
+      return;
+    }
+
+    try {
+      const result = await registerTransaction(
+        formData.counterparty,
+        formData.amount,
+        formData.currency,
+        formData.description
+      );
+      
+      if (result) {
+        setTxHash(result);
+        setSubmitted(true);
+      }
+    } catch (err) {
+      setError("Error al registrar la transacción. Intenta de nuevo.");
+      console.error(err);
+    }
   };
 
   if (submitted) {
@@ -62,16 +87,18 @@ export default function NewTransaction() {
               <FileText className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              ¡Transacción registrada!
+              {!isContractDeployed ? "¡Transacción simulada!" : "¡Transacción registrada!"}
             </h1>
             <p className="text-gray-600 mb-6">
-              Tu transacción ha sido registrada en la blockchain de Avalanche. 
-              Ahora espera la validación de tu contraparte.
+              {isContractDeployed 
+                ? "Tu transacción ha sido registrada en la blockchain de Avalanche. Ahora espera la validación de tu contraparte."
+                : "Modo demo: Los contratos aún no están desplegados. En producción, esta transacción se registraría en la blockchain."
+              }
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
               <p className="text-sm text-gray-600">Hash de transacción:</p>
               <p className="font-mono text-sm text-gray-900 break-all">
-                0x7f8d9e2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8
+                {txHash}
               </p>
             </div>
             <div className="flex gap-4 justify-center">
@@ -84,6 +111,7 @@ export default function NewTransaction() {
               <button 
                 onClick={() => {
                   setSubmitted(false);
+                  setTxHash("");
                   setFormData({ counterparty: "", amount: "", currency: "MXN", description: "" });
                 }}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
@@ -127,6 +155,25 @@ export default function NewTransaction() {
           <p className="text-gray-600 mb-8">
             Completa los datos de tu operación comercial para registrarla en la blockchain.
           </p>
+
+          {!isContractDeployed && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-yellow-800 font-medium">Modo demostración</p>
+                <p className="text-yellow-700 text-sm">
+                  Los contratos no están desplegados aún. Esta transacción se simulará localmente.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Contraparte */}
@@ -225,16 +272,16 @@ export default function NewTransaction() {
               </Link>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isRegistering}
                 className="flex-1 px-6 py-3 bg-avalanche-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isSubmitting ? (
+                {isRegistering ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Registrando...
                   </>
                 ) : (
-                  "Registrar transacción"
+                  isContractDeployed ? "Registrar transacción" : "Simular transacción"
                 )}
               </button>
             </div>

@@ -2,11 +2,17 @@
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
-import { TrendingUp, Users, FileText, Award, Plus, CheckCircle } from "lucide-react";
+import { TrendingUp, Users, FileText, Award, Plus, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useReputation } from "@/hooks/useReputation";
+import { useTransactions } from "@/hooks/useTransactions";
 
 export default function Dashboard() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+  const { reputation, hasReputation, isLoading: isLoadingReputation, contractAddress } = useReputation();
+  const { totalTransactions, transactionHashes, isLoading: isLoadingTransactions } = useTransactions();
+
+  const isContractDeployed = contractAddress && contractAddress !== "0x0000000000000000000000000000000000000000";
 
   if (!isConnected) {
     return (
@@ -41,7 +47,26 @@ export default function Dashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-1">Gestiona tu reputación financiera</p>
+          {address && (
+            <p className="text-sm text-gray-500 mt-2 font-mono">
+              {address.slice(0, 6)}...{address.slice(-4)}
+            </p>
+          )}
         </div>
+
+        {/* Contract Not Deployed Warning */}
+        {!isContractDeployed && (
+          <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-yellow-800 font-medium">Contratos no desplegados</p>
+              <p className="text-yellow-700 text-sm">
+                Los contratos inteligentes aún no han sido desplegados en Fuji Testnet. 
+                El dashboard muestra datos de demostración.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -49,17 +74,24 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Score de Reputación</p>
-                <p className="text-3xl font-bold text-avalanche-red">750</p>
+                <p className="text-3xl font-bold text-avalanche-red">
+                  {isLoadingReputation ? "..." : (reputation?.score || 0)}
+                </p>
               </div>
               <Award className="w-8 h-8 text-avalanche-red" />
             </div>
+            {!hasReputation && !isLoadingReputation && (
+              <p className="text-xs text-gray-500 mt-2">Sin reputación registrada</p>
+            )}
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Transacciones</p>
-                <p className="text-3xl font-bold text-gray-900">24</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoadingTransactions ? "..." : (isContractDeployed ? transactionHashes.length : 24)}
+                </p>
               </div>
               <FileText className="w-8 h-8 text-gray-400" />
             </div>
@@ -69,7 +101,9 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Validadas</p>
-                <p className="text-3xl font-bold text-green-600">18</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {isLoadingTransactions ? "..." : 18}
+                </p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
@@ -184,12 +218,17 @@ export default function Dashboard() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-gray-900">75%</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      {reputation ? Math.round((reputation.score / 1000) * 100) : 0}%
+                    </span>
                   </div>
                 </div>
               </div>
               <p className="text-center text-sm text-gray-600">
-                Excelente reputación. Sigue validando transacciones para mejorar.
+                {hasReputation 
+                  ? "Excelente reputación. Sigue validando transacciones para mejorar."
+                  : "Aún no tienes reputación. Registra tu primera transacción."
+                }
               </p>
             </div>
 
