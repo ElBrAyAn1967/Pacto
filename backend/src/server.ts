@@ -26,13 +26,23 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY']
 }));
 
-// Rate limiting
+// Rate limiting - by IP
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000'),
-  message: { error: 'Too many requests, please try again later' }
+  message: { error: 'Too many requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use(limiter);
+
+// Stricter rate limit for API endpoints
+const apiLimiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000'),
+  message: { error: 'API rate limit exceeded' },
+});
+app.use('/api/', apiLimiter);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));

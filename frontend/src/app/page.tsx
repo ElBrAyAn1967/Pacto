@@ -110,14 +110,14 @@ export default function Landing() {
 
             {/* Headline */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              The Infrastructure for{" "}
-              <span className="gradient-text">Financial Inclusion</span>
+              See What Banks Miss.{" "}
+              <span className="gradient-text">Lend with Confidence.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
-              PACTO enables banks and fintechs to assess creditworthiness of "invisible" 
-              PYMEs using alternative data and blockchain-verified reputation scores.
+              65% of PYMEs in LATAM are financially invisible. PACTO turns their real 
+              commercial reputation into bankable credit scores—powered by Avalanche.
             </p>
 
             {/* CTAs */}

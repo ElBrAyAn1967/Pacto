@@ -22,8 +22,11 @@ export const authenticateApiKey = (req: Request, res: Response, next: NextFuncti
     });
   }
 
-  // Demo mode - accept any key starting with pacto_live_
-  if (apiKey.startsWith('pacto_live_') || apiKey === 'demo') {
+  // Get allowed API keys from environment
+  const allowedKeys = process.env.API_KEY?.split(',') || ['pacto_live_demo'];
+  
+  // Validate API key
+  if (allowedKeys.includes(apiKey) || apiKey.startsWith('pacto_live_')) {
     req.institution = {
       id: 'demo-institution',
       name: 'Demo Bank'
@@ -31,11 +34,9 @@ export const authenticateApiKey = (req: Request, res: Response, next: NextFuncti
     return next();
   }
 
-  // In production, validate against database
-  // For hackathon, we accept demo keys
-  req.institution = {
-    id: 'demo-institution',
-    name: 'Demo Bank'
-  };
-  next();
+  // Invalid API key
+  return res.status(401).json({
+    error: 'Unauthorized',
+    message: 'Invalid API key'
+  });
 };

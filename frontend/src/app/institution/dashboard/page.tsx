@@ -60,9 +60,13 @@ export default function InstitutionDashboard() {
     fetchData();
   }, []);
 
+  // Input validation: max 100 chars to prevent ReDoS
+  const MAX_SEARCH_LENGTH = 100;
+  const sanitizedQuery = searchQuery.slice(0, MAX_SEARCH_LENGTH);
+  
   const filteredPymes = pymes.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.wallet.toLowerCase().includes(searchQuery.toLowerCase())
+    p.name.toLowerCase().includes(sanitizedQuery.toLowerCase()) ||
+    p.wallet.toLowerCase().includes(sanitizedQuery.toLowerCase())
   );
 
   const getRiskBadge = (risk: string) => {
@@ -293,6 +297,7 @@ export default function InstitutionDashboard() {
                       type="text"
                       placeholder="Search PYMEs..."
                       value={searchQuery}
+                      maxLength={100}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="core-input pl-10 w-full sm:w-64"
                     />
