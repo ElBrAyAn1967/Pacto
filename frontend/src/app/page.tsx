@@ -2,85 +2,124 @@
 
 import Link from "next/link";
 import { Shield, ArrowRight, Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-// Componente de Esfera de Partículas
-function ParticleSphere() {
-  // Generar múltiples anillos de partículas
-  const rings = [
-    { count: 30, radius: 100, speed: 20, delay: 0 },
-    { count: 40, radius: 140, speed: 25, delay: 2 },
-    { count: 50, radius: 180, speed: 30, delay: 4 },
-    { count: 35, radius: 130, speed: 22, delay: 1, rotateX: 60 },
-    { count: 45, radius: 160, speed: 28, delay: 3, rotateX: 45 },
-    { count: 55, radius: 200, speed: 35, delay: 5, rotateX: 30 },
+// Esfera de partículas 3D densa
+function DenseParticleSphere() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    let animationId: number;
+    let startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      setRotation({
+        x: elapsed * 5,
+        y: elapsed * 8
+      });
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  // Generar partículas distribuidas en esfera 3D
+  const generateParticles = (count: number, radius: number) => {
+    const particles = [];
+    for (let i = 0; i < count; i++) {
+      // Distribución esférica uniforme
+      const phi = Math.acos(-1 + (2 * i) / count);
+      const theta = Math.sqrt(count * Math.PI) * phi;
+
+      const x = radius * Math.cos(theta) * Math.sin(phi);
+      const y = radius * Math.sin(theta) * Math.sin(phi);
+      const z = radius * Math.cos(phi);
+
+      particles.push({ x, y, z, id: i });
+    }
+    return particles;
+  };
+
+  // Múltiples capas de partículas
+  const layers = [
+    { count: 400, radius: 150, size: 2, opacity: 0.8 },
+    { count: 300, radius: 130, size: 1.5, opacity: 0.6 },
+    { count: 250, radius: 170, size: 1.5, opacity: 0.5 },
+    { count: 200, radius: 110, size: 1, opacity: 0.4 },
+    { count: 150, radius: 190, size: 1, opacity: 0.3 },
+    { count: 100, radius: 90, size: 1, opacity: 0.5 },
+    { count: 80, radius: 210, size: 1, opacity: 0.25 },
   ];
 
+  const allParticles = layers.flatMap((layer, layerIndex) => {
+    const particles = generateParticles(layer.count, layer.radius);
+    return particles.map(p => ({
+      ...p,
+      layer: layerIndex,
+      size: layer.size,
+      opacity: layer.opacity,
+    }));
+  });
+
   return (
-    <div className="relative w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px]">
-      {rings.map((ring, ringIndex) => (
-        <div
-          key={ringIndex}
-          className="absolute inset-0 flex items-center justify-center"
-          style={{
-            transform: ring.rotateX ? `rotateX(${ring.rotateX}deg)` : 'rotateX(75deg)',
-          }}
-        >
-          <div
-            className="absolute"
-            style={{
-              width: `${ring.radius * 2}px`,
-              height: `${ring.radius * 2}px`,
-              animation: `rotate ${ring.speed}s linear infinite`,
-              animationDelay: `${ring.delay}s`,
-            }}
-          >
-            {Array.from({ length: ring.count }).map((_, i) => {
-              const angle = (i / ring.count) * 360;
-              return (
-                <div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full"
-                  style={{
-                    top: `${50 + 50 * Math.sin((angle * Math.PI) / 180)}%`,
-                    left: `${50 + 50 * Math.cos((angle * Math.PI) / 180)}%`,
-                    transform: 'translate(-50%, -50%)',
-                    opacity: 0.6 + Math.random() * 0.4,
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-      ))}
-      
-      {/* Partículas adicionales en el centro */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        {Array.from({ length: 100 }).map((_, i) => (
-          <div
-            key={`center-${i}`}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full"
-            style={{
-              top: `${40 + Math.random() * 20}%`,
-              left: `${40 + Math.random() * 20}%`,
-              opacity: 0.3 + Math.random() * 0.5,
-              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
-            }}
-          />
-        ))}
+    <div 
+      ref={containerRef}
+      className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] lg:w-[550px] lg:h-[550px]"
+      style={{ perspective: '1000px' }}
+    >
+      <div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transformStyle: 'preserve-3d',
+          transition: 'transform 0.1s linear',
+        }}
+      >
+        {allParticles.map((particle) => {
+          // Proyección 3D a 2D con profundidad
+          const scale = 1 + (particle.z / 300);
+          const opacity = particle.opacity * (0.5 + (particle.z + 150) / 300);
+          
+          return (
+            <div
+              key={`${particle.layer}-${particle.id}`}
+              className="absolute rounded-full bg-white"
+              style={{
+                width: `${particle.size * (0.8 + Math.random() * 0.4)}px`,
+                height: `${particle.size * (0.8 + Math.random() * 0.4)}px`,
+                left: `calc(50% + ${particle.x}px)`,
+                top: `calc(50% + ${particle.y}px)`,
+                opacity: Math.max(0.1, Math.min(1, opacity)),
+                transform: `translate(-50%, -50%) scale(${scale})`,
+              }}
+            />
+          );
+        })}
       </div>
 
-      <style jsx>{`
-        @keyframes rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px); }
-        }
-      `}</style>
+      {/* Líneas conectoras sutiles */}
+      <svg 
+        className="absolute inset-0 w-full h-full pointer-events-none opacity-10"
+        style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` }}
+      >
+        {allParticles.slice(0, 50).map((p1, i) => {
+          const p2 = allParticles[(i + 1) % allParticles.length];
+          return (
+            <line
+              key={`line-${i}`}
+              x1={`${50 + (p1.x / 250) * 50}%`}
+              y1={`${50 + (p1.y / 250) * 50}%`}
+              x2={`${50 + (p2.x / 250) * 50}%`}
+              y2={`${50 + (p2.y / 250) * 50}%`}
+              stroke="white"
+              strokeWidth="0.5"
+            />
+          );
+        })}
+      </svg>
     </div>
   );
 }
@@ -203,9 +242,9 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right Visual - Particle Sphere */}
+            {/* Right Visual - Dense Particle Sphere */}
             <div className={`flex items-center justify-center transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <ParticleSphere />
+              <DenseParticleSphere />
             </div>
           </div>
         </div>
