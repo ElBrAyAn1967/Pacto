@@ -7,6 +7,28 @@ interface ApiResponse<T> {
   error?: string;
 }
 
+interface Pyme {
+  id: string;
+  name: string;
+  wallet: string;
+  score: number;
+  risk: 'low' | 'medium' | 'high';
+  volume: number;
+  transactions: number;
+  status: 'active' | 'pending';
+}
+
+interface InstitutionStats {
+  totalPymes: number;
+  activePymes: number;
+  totalVolume: number;
+  avgScore: number;
+  totalTransactions: number;
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+}
+
 class ApiClient {
   private baseUrl: string;
   private apiKey: string;
@@ -40,37 +62,37 @@ class ApiClient {
   }
 
   // Reputation API
-  async getReputation(wallet: string) {
-    return this.request(`/api/v1/reputation/${wallet}`);
+  async getReputation(wallet: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/api/v1/reputation/${wallet}`);
   }
 
-  async getReputationScore(wallet: string) {
-    return this.request(`/api/v1/reputation/${wallet}/score`);
+  async getReputationScore(wallet: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/api/v1/reputation/${wallet}/score`);
   }
 
-  async checkReputationBatch(wallets: string[]) {
-    return this.request('/api/v1/reputation/check', {
+  async checkReputationBatch(wallets: string[]): Promise<ApiResponse<any>> {
+    return this.request<any>('/api/v1/reputation/check', {
       method: 'POST',
       body: JSON.stringify({ wallets }),
     });
   }
 
   // Transactions API
-  async getTransaction(txHash: string) {
-    return this.request(`/api/v1/transactions/${txHash}`);
+  async getTransaction(txHash: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/api/v1/transactions/${txHash}`);
   }
 
-  async getPymeTransactions(wallet: string) {
-    return this.request(`/api/v1/transactions/pyme/${wallet}`);
+  async getPymeTransactions(wallet: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/api/v1/transactions/pyme/${wallet}`);
   }
 
   // Institutions API
-  async getInstitutionStats() {
-    return this.request('/api/v1/institutions/stats');
+  async getInstitutionStats(): Promise<ApiResponse<InstitutionStats>> {
+    return this.request<InstitutionStats>('/api/v1/institutions/stats');
   }
 
-  async getInstitutionPymes() {
-    return this.request('/api/v1/institutions/pymes');
+  async getInstitutionPymes(): Promise<ApiResponse<Pyme[]>> {
+    return this.request<Pyme[]>('/api/v1/institutions/pymes');
   }
 
   // Health check
