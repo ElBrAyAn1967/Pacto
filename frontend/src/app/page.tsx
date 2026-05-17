@@ -1,70 +1,77 @@
 'use client';
 
 import Link from "next/link";
-import { Shield, ArrowRight, Menu, X } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { Shield, ArrowRight, Menu, X, Globe, Zap, BarChart3, Network } from "lucide-react";
+import { useState, useEffect } from "react";
 
-// Efecto Squarespace: Nube de partículas tipo constelación (ESTÁTICA)
-function SquarespaceSphere() {
-  // Generar 4000 partículas distribuidas en esfera
-  const particles = useMemo(() => {
-    const count = 4000;
-    const items = [];
-    
-    for (let i = 0; i < count; i++) {
-      // Distribución esférica uniforme
-      const phi = Math.acos(-1 + (2 * i) / count);
-      const theta = Math.sqrt(count * Math.PI) * phi;
-      
-      // Radio variable para efecto de nube dispersa
-      const radiusBase = 220;
-      const radiusVariation = (Math.random() - 0.5) * 80;
-      const radius = radiusBase + radiusVariation;
-      
-      const x = radius * Math.cos(theta) * Math.sin(phi);
-      const y = radius * Math.sin(theta) * Math.sin(phi);
-      const z = radius * Math.cos(phi);
-      
-      // Opacidad aleatoria para efecto de profundidad
-      const opacity = 0.3 + Math.random() * 0.7;
-      
-      items.push({ x, y, z, opacity, id: i });
-    }
-    return items;
-  }, []);
-
+// Globo wireframe con anillos - estilo imagen
+function WireframeGlobe() {
   return (
-    <div 
-      className="relative w-[450px] h-[450px] sm:w-[550px] sm:h-[550px] lg:w-[650px] lg:h-[650px]"
-      style={{ perspective: '1200px' }}
-    >
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: 'rotateX(20deg) rotateY(30deg) rotateZ(0deg)',
-          transformStyle: 'preserve-3d',
-        }}
-      >
-        {particles.map((particle) => {
-          // Calcular escala basada en profundidad (z)
-          const scale = 0.6 + ((particle.z + 250) / 500) * 0.6;
-          const finalOpacity = particle.opacity * scale;
+    <div className="relative w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px]">
+      {/* Anillos concéntricos */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* Anillo exterior */}
+        <div className="absolute w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] lg:w-[550px] lg:h-[550px] border border-white/20 rounded-full" />
+        
+        {/* Anillo medio */}
+        <div className="absolute w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] lg:w-[440px] lg:h-[440px] border border-white/15 rounded-full" />
+        
+        {/* Anillo interior */}
+        <div className="absolute w-[210px] h-[210px] sm:w-[270px] sm:h-[270px] lg:w-[330px] lg:h-[330px] border border-white/10 rounded-full" />
+        
+        {/* Líneas de conexión desde centro a anillos */}
+        <svg className="absolute inset-0 w-full h-full" style={{ transform: 'rotate(0deg)' }}>
+          <line x1="50%" y1="50%" x2="50%" y2="5%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+          <line x1="50%" y1="50%" x2="95%" y2="50%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+          <line x1="50%" y1="50%" x2="50%" y2="95%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+          <line x1="50%" y1="50%" x2="5%" y2="50%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        </svg>
+      </div>
+
+      {/* Globo central */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] lg:w-[180px] lg:h-[180px]">
+          {/* Círculo exterior del globo */}
+          <div className="absolute inset-0 border-2 border-white/30 rounded-full" />
           
-          return (
-            <div
-              key={particle.id}
-              className="absolute rounded-full bg-white"
-              style={{
-                width: '1.5px',
-                height: '1.5px',
-                left: `calc(50% + ${particle.x}px)`,
-                top: `calc(50% + ${particle.y}px)`,
-                opacity: finalOpacity,
-                transform: `translate(-50%, -50%)`,
-              }}
-            />
-          );
-        })}
+          {/* Meridianos (líneas verticales) */}
+          <div className="absolute inset-0 border border-white/20 rounded-full" style={{ transform: 'rotateY(0deg)' }} />
+          <div className="absolute inset-0 border border-white/20 rounded-full" style={{ transform: 'rotateY(60deg)' }} />
+          <div className="absolute inset-0 border border-white/20 rounded-full" style={{ transform: 'rotateY(120deg)' }} />
+          
+          {/* Paralelos (líneas horizontales) */}
+          <div className="absolute top-[25%] left-0 right-0 h-px bg-white/15" />
+          <div className="absolute top-[50%] left-0 right-0 h-px bg-white/20" />
+          <div className="absolute top-[75%] left-0 right-0 h-px bg-white/15" />
+          
+          {/* Centro del globo */}
+          <div className="absolute inset-[35%] border border-white/30 rounded-full flex items-center justify-center">
+            <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-white/40" />
+          </div>
+        </div>
+      </div>
+
+      {/* Iconos en los 4 puntos cardinales */}
+      <div className="absolute inset-0">
+        {/* Arriba */}
+        <div className="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/20 flex items-center justify-center">
+          <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" />
+        </div>
+        
+        {/* Derecha */}
+        <div className="absolute top-1/2 right-[5%] transform -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/20 flex items-center justify-center">
+          <Network className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" />
+        </div>
+        
+        {/* Abajo */}
+        <div className="absolute bottom-[5%] left-1/2 transform -translate-x-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/20 flex items-center justify-center">
+          <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" />
+        </div>
+        
+        {/* Izquierda */}
+        <div className="absolute top-1/2 left-[5%] transform -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/20 flex items-center justify-center">
+          <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" />
+        </div>
       </div>
     </div>
   );
@@ -188,9 +195,9 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right Visual - Squarespace Style Sphere */}
+            {/* Right Visual - Wireframe Globe */}
             <div className={`flex items-center justify-center transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <SquarespaceSphere />
+              <WireframeGlobe />
             </div>
           </div>
         </div>
