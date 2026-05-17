@@ -4,24 +4,8 @@ import Link from "next/link";
 import { Shield, ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
-// Efecto Squarespace: Nube de partículas tipo constelación
+// Efecto Squarespace: Nube de partículas tipo constelación (ESTÁTICA)
 function SquarespaceSphere() {
-  const [rotation, setRotation] = useState(0);
-
-  useEffect(() => {
-    let animationId: number;
-    let startTime = Date.now();
-
-    const animate = () => {
-      const elapsed = (Date.now() - startTime) / 1000;
-      setRotation(elapsed * 3); // Rotación muy lenta
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-    return () => cancelAnimationFrame(animationId);
-  }, []);
-
   // Generar 4000 partículas distribuidas en esfera
   const particles = useMemo(() => {
     const count = 4000;
@@ -57,9 +41,8 @@ function SquarespaceSphere() {
       <div
         className="absolute inset-0"
         style={{
-          transform: `rotateX(${rotation * 0.5}deg) rotateY(${rotation}deg) rotateZ(${rotation * 0.3}deg)`,
+          transform: 'rotateX(20deg) rotateY(30deg) rotateZ(0deg)',
           transformStyle: 'preserve-3d',
-          transition: 'transform 0.05s linear',
         }}
       >
         {particles.map((particle) => {
