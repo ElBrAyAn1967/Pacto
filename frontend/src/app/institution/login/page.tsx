@@ -18,35 +18,29 @@ export default function InstitutionLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[128px]" />
-      </div>
-
-      <div className="relative w-full max-w-md">
+    <div className="min-h-screen bg-[#0F0F10] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-black" />
+          <Link href="/" className="inline-flex items-center gap-2">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-black" />
             </div>
-            <span className="text-2xl font-bold text-white">PACTO</span>
+            <span className="text-xl font-semibold text-white">PACTO</span>
           </Link>
-          <p className="text-text-secondary mt-2">Institution Portal</p>
+          <p className="text-[#71717A] mt-2 text-sm">Institution Portal</p>
         </div>
 
         {/* Login Card */}
-        <div className="core-card-elevated p-8">
+        <div className="card p-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-            <p className="text-text-secondary">Sign in to access your dashboard</p>
+            <h1 className="title-md mb-1">Welcome back</h1>
+            <p className="text-small">Sign in to access your dashboard</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
+              <label className="block text-small mb-1.5">
                 Institution Email
               </label>
               <input
@@ -55,28 +49,28 @@ export default function InstitutionLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@banco.com"
-                className="core-input"
+                className="input"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
+              <label className="block text-small mb-1.5">
                 Password
               </label>
               <input
                 type="password"
                 required
                 placeholder="••••••••"
-                className="core-input"
+                className="input"
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-border bg-surface text-primary" />
-                <span className="text-text-secondary">Remember me</span>
+            <div className="flex items-center justify-between text-xs">
+              <label className="flex items-center gap-2 cursor-pointer text-[#71717A]">
+                <input type="checkbox" className="rounded border-[#27272A] bg-[#18181B]" />
+                <span>Remember me</span>
               </label>
-              <Link href="#" className="text-primary hover:text-primary-hover transition-colors">
+              <Link href="#" className="text-white hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -84,32 +78,32 @@ export default function InstitutionLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="core-btn w-full py-4"
+              className="btn w-full"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Signing in...
                 </>
               ) : (
                 <>
                   Sign In
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-border">
-            <p className="text-text-muted text-sm text-center">
+          <div className="mt-5 pt-5 border-t border-[#27272A]">
+            <p className="text-[#71717A] text-xs text-center">
               Demo mode: any credentials work
             </p>
           </div>
         </div>
 
-        <p className="text-center text-text-secondary text-sm mt-6">
+        <p className="text-center text-[#71717A] text-xs mt-6">
           Don't have an account?{' '}
-          <Link href="#" className="text-primary hover:text-primary-hover transition-colors">
+          <Link href="#" className="text-white hover:underline">
             Contact Sales
           </Link>
         </p>
