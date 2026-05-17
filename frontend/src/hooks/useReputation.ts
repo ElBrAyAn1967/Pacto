@@ -37,12 +37,12 @@ export function useReputation() {
   return {
     hasReputation,
     reputation: reputation ? {
-      score: Number(reputation[0]),
-      transactionCount: Number(reputation[1]),
-      validationRate: Number(reputation[2]),
-      createdAt: Number(reputation[3]),
-      lastUpdate: Number(reputation[4]),
-      metadataURI: reputation[5],
+      score: Number(reputation.score),
+      transactionCount: Number(reputation.transactionCount),
+      validationRate: Number(reputation.validationRate),
+      createdAt: Number(reputation.createdAt),
+      lastUpdate: Number(reputation.lastUpdate),
+      metadataURI: reputation.metadataURI,
     } : null,
     createReputation: (pymeAddress: string) => 
       createReputation({
