@@ -8,22 +8,53 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        background: '#0a0a0a',
+        surface: '#141414',
+        'surface-elevated': '#1a1a1a',
+        'surface-hover': '#242424',
         primary: {
-          50: '#fdf2f2',
-          100: '#fce7e7',
-          200: '#f9d0d0',
-          300: '#f4a9a9',
-          400: '#ec7777',
-          500: '#e04e4e',
-          600: '#cd3333',
-          700: '#ac2727',
-          800: '#8e2424',
-          900: '#762222',
+          DEFAULT: '#00d1ff',
+          hover: '#33daff',
+          muted: 'rgba(0, 209, 255, 0.1)',
         },
-        avalanche: {
-          red: '#E84142',
-          dark: '#1A1A1A',
+        secondary: {
+          DEFAULT: '#8b5cf6',
+          hover: '#a78bfa',
+        },
+        border: {
+          DEFAULT: '#27272a',
+          hover: '#3f3f46',
+        },
+        text: {
+          primary: '#ffffff',
+          secondary: '#a1a1aa',
+          muted: '#71717a',
         }
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'hero-glow': 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 209, 255, 0.15), transparent)',
+      },
+      boxShadow: {
+        'glow': '0 0 40px rgba(0, 209, 255, 0.15)',
+        'card': '0 0 0 1px rgba(255, 255, 255, 0.03), 0 4px 24px rgba(0, 0, 0, 0.4)',
+        'card-hover': '0 0 0 1px rgba(0, 209, 255, 0.1), 0 4px 24px rgba(0, 0, 0, 0.4)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 20px rgba(0, 209, 255, 0.2)' },
+          '100%': { boxShadow: '0 0 40px rgba(0, 209, 255, 0.4)' },
+        },
       },
     },
   },

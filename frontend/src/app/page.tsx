@@ -1,34 +1,95 @@
 'use client';
 
 import { useState } from "react";
-import { Building2, Users, TrendingUp, Shield, ArrowRight, CheckCircle, BarChart3 } from "lucide-react";
+import { 
+  Shield, ArrowRight, Zap, Globe, Lock, BarChart3, 
+  ChevronRight, CheckCircle, Wallet, Building2, TrendingUp
+} from "lucide-react";
 import Link from "next/link";
 
 export default function Landing() {
+  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+
+  const stats = [
+    { value: "$380B", label: "Unmet Credit Demand" },
+    { value: "15M+", label: "PYMEs in LATAM" },
+    { value: "65%", label: "Without Bank Access" },
+    { value: "85%", label: "Loan Rejection Rate" },
+  ];
+
+  const features = [
+    {
+      icon: Shield,
+      title: "On-Chain Reputation",
+      description: "Immutable credit scores powered by Avalanche blockchain. Every transaction verified and stored permanently.",
+    },
+    {
+      icon: Zap,
+      title: "Real-Time Scoring",
+      description: "Get instant PACTO scores with sub-second latency. Our algorithm analyzes 50+ data points instantly.",
+    },
+    {
+      icon: Lock,
+      title: "Privacy First",
+      description: "Zero-knowledge proofs ensure sensitive data stays private while maintaining complete auditability.",
+    },
+    {
+      icon: Globe,
+      title: "Cross-Border Ready",
+      description: "Unified reputation across borders. A PYME's score in Mexico is valid in Colombia, Chile, and beyond.",
+    },
+  ];
+
+  const steps = [
+    {
+      step: "01",
+      title: "Connect",
+      description: "Integrate PACTO API in minutes with our developer-friendly documentation and SDKs.",
+    },
+    {
+      step: "02",
+      title: "Analyze",
+      description: "Query any wallet address to get instant PACTO Score, risk assessment, and credit recommendations.",
+    },
+    {
+      step: "03",
+      title: "Lend",
+      description: "Make data-driven lending decisions with confidence. Reduce default rates by up to 40%.",
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+    <main className="min-h-screen bg-background overflow-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[128px]" />
+      </div>
+
+      {/* Navigation */}
+      <nav className="relative z-50 border-b border-border/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <span className="text-2xl font-bold text-avalanche-red">PACTO</span>
-              <span className="ml-3 text-sm text-slate-500 hidden sm:block border-l border-slate-300 pl-3">
-                Infrastructure for Financial Institutions
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+                <Shield className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-xl font-bold text-white">PACTO</span>
             </div>
-            <div className="flex items-center gap-6">
-              <Link href="#features" className="text-slate-600 hover:text-slate-900 hidden md:block">
+            
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="#features" className="text-text-secondary hover:text-white transition-colors text-sm">
                 Features
               </Link>
-              <Link href="#api" className="text-slate-600 hover:text-slate-900 hidden md:block">
+              <Link href="#how-it-works" className="text-text-secondary hover:text-white transition-colors text-sm">
+                How it Works
+              </Link>
+              <Link href="#api" className="text-text-secondary hover:text-white transition-colors text-sm">
                 API
               </Link>
-              <Link 
-                href="/institution/login"
-                className="px-5 py-2 bg-avalanche-red text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-              >
-                Institution Login
+              <Link href="/institution/demo" className="core-btn text-sm">
+                Launch Demo
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -36,267 +97,228 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-avalanche-red/10 text-avalanche-red text-sm font-medium mb-6">
-                <Shield className="w-4 h-4" />
-                <span>White-Label Reputation Infrastructure</span>
-              </div>
-              
-              <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-                Lend to the <span className="text-avalanche-red">invisible</span> economy
-              </h1>
-              
-              <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-                PACTO enables banks, fintechs, and lenders to assess creditworthiness 
-                of "invisible" PYMEs using alternative data and blockchain-verified 
-                reputation scores.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href="/institution/demo"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-avalanche-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                >
-                  See Demo Dashboard
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link 
-                  href="#api"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold hover:bg-slate-50 transition-colors"
-                >
-                  API Documentation
-                </Link>
-              </div>
+      <section className="relative pt-20 pb-32">
+        <div className="absolute inset-0 bg-hero-glow" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-muted border border-primary/20 mb-8">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <span className="text-primary text-sm font-medium">Now on Avalanche Fuji Testnet</span>
             </div>
-            
-            <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="text-sm text-slate-500">PACTO Score</p>
-                    <p className="text-3xl font-bold text-slate-900">847/1000</p>
-                  </div>
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              The Infrastructure for{" "}
+              <span className="gradient-text">Financial Inclusion</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
+              PACTO enables banks and fintechs to assess creditworthiness of "invisible" 
+              PYMEs using alternative data and blockchain-verified reputation scores.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <Link href="/institution/demo" className="core-btn text-lg px-8 py-4">
+                Try Demo Dashboard
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link href="https://github.com/ElBrAyAn1967/Pacto" className="core-btn-secondary text-lg px-8 py-4">
+                View Documentation
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {stats.map((stat, idx) => (
+                <div key={idx} className="core-card p-6 text-center">
+                  <div className="text-3xl font-bold gradient-text mb-1">{stat.value}</div>
+                  <div className="text-text-secondary text-sm">{stat.label}</div>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Validation Rate</span>
-                    <span className="font-semibold">94%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{width: '94%'}}></div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">12-Month Volume</span>
-                    <span className="font-semibold">$1.2M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Recommended Credit</span>
-                    <span className="font-semibold text-green-600">$180,000</span>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-slate-900 text-white">
+      {/* Features Grid */}
+      <section id="features" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-avalanche-red mb-2">$380B</div>
-              <div className="text-slate-400">Unmet Credit Demand</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-avalanche-red mb-2">15M+</div>
-              <div className="text-slate-400">PYMEs in LATAM</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-avalanche-red mb-2">65%</div>
-              <div className="text-slate-400">Without Bank Access</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-avalanche-red mb-2">85%</div>
-              <div className="text-slate-400">Loan Rejection Rate</div>
-            </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Built for Modern Finance
+            </h2>
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Enterprise-grade infrastructure that scales with your lending operations
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, idx) => (
+              <div
+                key={idx}
+                className="core-card-elevated p-8 group cursor-pointer"
+                onMouseEnter={() => setHoveredFeature(idx)}
+                onMouseLeave={() => setHoveredFeature(null)}
+              >
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${
+                  hoveredFeature === idx ? 'bg-primary' : 'bg-primary-muted'
+                }`}>
+                  <feature.icon className={`w-7 h-7 transition-colors ${
+                    hoveredFeature === idx ? 'text-black' : 'text-primary'
+                  }`} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-text-secondary leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="features" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              How PACTO Works
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Three Steps to Smarter Lending
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Three simple steps to assess creditworthiness of previously invisible businesses
+            <p className="text-text-secondary text-lg">
+              From integration to first loan decision in under 30 minutes
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-8 bg-white rounded-2xl shadow-sm border border-slate-200">
-              <div className="w-12 h-12 bg-avalanche-red rounded-lg flex items-center justify-center mb-6">
-                <Building2 className="w-6 h-6 text-white" />
+            {steps.map((step, idx) => (
+              <div key={idx} className="relative">
+                <div className="text-6xl font-bold text-surface-elevated mb-4">{step.step}</div>
+                <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
+                <p className="text-text-secondary leading-relaxed">{step.description}</p>
+                {idx < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-8 right-0 transform translate-x-1/2">
+                    <ChevronRight className="w-8 h-8 text-border" />
+                  </div>
+                )}
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">1. Integrate</h3>
-              <p className="text-slate-600">
-                Connect PACTO to your existing systems via our REST API or use our 
-                white-label dashboard with your branding.
-              </p>
-            </div>
-
-            <div className="p-8 bg-white rounded-2xl shadow-sm border border-slate-200">
-              <div className="w-12 h-12 bg-avalanche-red rounded-lg flex items-center justify-center mb-6">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">2. Analyze</h3>
-              <p className="text-slate-600">
-                Our algorithm analyzes verified commercial transactions on-chain to 
-                generate a PACTO Score (0-1000) and risk assessment.
-              </p>
-            </div>
-
-            <div className="p-8 bg-white rounded-2xl shadow-sm border border-slate-200">
-              <div className="w-12 h-12 bg-avalanche-red rounded-lg flex items-center justify-center mb-6">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">3. Lend</h3>
-              <p className="text-slate-600">
-                Make informed lending decisions with data you can trust. 
-                Recommended credit limits and interest rates included.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* API Section */}
-      <section id="api" className="py-20 bg-slate-50">
+      {/* API Preview */}
+      <section id="api" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                Simple REST API
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Simple, Powerful API
               </h2>
-              <p className="text-lg text-slate-600 mb-8">
-                Integrate PACTO reputation scoring into your existing lending workflow 
-                with just a few API calls.
+              <p className="text-text-secondary text-lg mb-8 leading-relaxed">
+                RESTful endpoints designed for developer productivity. Get started with just a few lines of code.
               </p>
               
               <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">Check Reputation</p>
-                    <p className="text-slate-600">GET /api/v1/reputation/:wallet</p>
+                {[
+                  "Sub-100ms response times",
+                  "99.9% uptime SLA",
+                  "Real-time webhooks",
+                  "Comprehensive SDKs",
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-white">{item}</span>
                   </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">Batch Processing</p>
-                    <p className="text-slate-600">POST /api/v1/reputation/batch</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">Real-time Webhooks</p>
-                    <p className="text-slate-600">Instant notifications on score changes</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-            
-            <div className="bg-slate-900 rounded-2xl p-6 overflow-hidden">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              </div>
-              <pre className="text-sm text-green-400 overflow-x-auto">
-                <code>{`// Request
-POST /api/v1/reputation/check
-Headers: {
-  "Authorization": "Bearer sk_live_xxx",
-  "Content-Type": "application/json"
-}
-Body: {
-  "wallet": "0x742d35Cc6634C..."
-}
 
-// Response
-{
-  "wallet": "0x742d35Cc6634C...",
-  "pacto_score": 847,
-  "risk_level": "low",
-  "recommended_credit": 180000,
-  "recommended_rate": 0.18,
-  "metrics": {
-    "total_transactions": 47,
-    "validated_rate": 0.94,
-    "volume_12m": 1200000,
-    "avg_transaction": 25532
+            <div className="core-card p-6 font-mono text-sm overflow-hidden">
+              <div className="flex items-center gap-2 mb-4 border-b border-border pb-4">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="ml-4 text-text-muted">example.js</span>
+              </div>
+              <pre className="text-text-secondary overflow-x-auto">
+{`// Get PACTO Score
+const response = await fetch(
+  'https://api.pacto.io/v1/reputation/0x742d...',
+  {
+    headers: {
+      'Authorization': 'Bearer sk_live_xxx'
+    }
   }
-}`}</code>
+);
+
+const { data } = await response.json();
+
+console.log(data);
+// {
+//   wallet: "0x742d...",
+//   pactoScore: 847,
+//   riskLevel: "low",
+//   recommendedCredit: 180000,
+//   recommendedRate: 0.18
+// }`}
               </pre>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20">
+      {/* CTA Section */}
+      <section className="py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-            Ready to lend to the invisible economy?
-          </h2>
-          <p className="text-xl text-slate-600 mb-8">
-            Join leading financial institutions using PACTO to expand their 
-            lending portfolios with confidence.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/institution/demo"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-avalanche-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
-            >
-              Try Demo Dashboard
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="https://github.com/ElBrAyAn1967/Pacto"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold hover:bg-slate-50 transition-colors"
-            >
-              View on GitHub
-            </Link>
+          <div className="core-card-elevated p-12 glow-card">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+              Ready to Transform Your Lending?
+            </h2>
+            <p className="text-text-secondary text-lg mb-8 max-w-2xl mx-auto">
+              Join leading financial institutions using PACTO to expand their portfolios 
+              into the $380B untapped PYME market.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/institution/demo" className="core-btn text-lg px-8 py-4">
+                Launch Demo
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link href="https://github.com/ElBrAyAn1967/Pacto" className="core-btn-secondary text-lg px-8 py-4">
+                View on GitHub
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-900 text-white">
+      <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center">
-              <span className="text-2xl font-bold text-avalanche-red">PACTO</span>
-              <span className="ml-3 text-sm text-slate-400">Avalanche x CLP Hackathon 2025</span>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                <Shield className="w-4 h-4 text-black" />
+              </div>
+              <span className="text-lg font-bold text-white">PACTO</span>
             </div>
-            <div className="flex gap-6 text-slate-400">
+            
+            <div className="flex items-center gap-6 text-text-secondary text-sm">
+              <span>Powered by Avalanche</span>
+              <span className="text-border">|</span>
               <Link href="https://github.com/ElBrAyAn1967/Pacto" className="hover:text-white transition-colors">
                 GitHub
               </Link>
               <Link href="https://testnet.snowtrace.io/" className="hover:text-white transition-colors">
                 Snowtrace
               </Link>
+            </div>
+            
+            <div className="text-text-muted text-sm">
+              © 2026 PACTO. Built for Avalanche x CLP Hackathon.
             </div>
           </div>
         </div>

@@ -1,93 +1,82 @@
 'use client';
 
 import { useState } from "react";
-import { Building2, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import { Shield, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function InstitutionLogin() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
-    
-    // Simulate login - in production this would validate against backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo, always succeed
+    await new Promise(resolve => setTimeout(resolve, 800));
     router.push("/institution/dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[128px]" />
+      </div>
+
+      <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <span className="text-3xl font-bold text-avalanche-red">PACTO</span>
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-black" />
+            </div>
+            <span className="text-2xl font-bold text-white">PACTO</span>
           </Link>
-          <p className="text-slate-600 mt-2">Institution Portal</p>
+          <p className="text-text-secondary mt-2">Institution Portal</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-avalanche-red/10 rounded-lg flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-avalanche-red" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">Institution Login</h1>
-              <p className="text-sm text-slate-600">Access your dashboard</p>
-            </div>
+        <div className="core-card-elevated p-8">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
+            <p className="text-text-secondary">Sign in to access your dashboard</p>
           </div>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Institution Email
               </label>
               <input
                 type="email"
-                id="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@banco.com"
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-avalanche-red focus:border-avalanche-red outline-none transition-all"
+                className="core-input"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Password
               </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  id="password"
-                  required
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-avalanche-red focus:border-avalanche-red outline-none transition-all"
-                />
-                <Lock className="absolute right-3 top-3.5 w-5 h-5 text-slate-400" />
-              </div>
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                className="core-input"
+              />
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded border-slate-300" />
-                <span className="text-slate-600">Remember me</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="rounded border-border bg-surface text-primary" />
+                <span className="text-text-secondary">Remember me</span>
               </label>
-              <Link href="#" className="text-avalanche-red hover:underline">
+              <Link href="#" className="text-primary hover:text-primary-hover transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -95,11 +84,11 @@ export default function InstitutionLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 bg-avalanche-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="core-btn w-full py-4"
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Signing in...
                 </>
               ) : (
@@ -111,22 +100,16 @@ export default function InstitutionLogin() {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-200">
-            <p className="text-sm text-slate-600 text-center">
-              For demo purposes, click Sign In with any credentials
+          <div className="mt-6 pt-6 border-t border-border">
+            <p className="text-text-muted text-sm text-center">
+              Demo mode: any credentials work
             </p>
-            <Link 
-              href="/institution/demo"
-              className="mt-3 block text-center text-avalanche-red hover:underline text-sm"
-            >
-              Or view demo without login →
-            </Link>
           </div>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
+        <p className="text-center text-text-secondary text-sm mt-6">
           Don't have an account?{' '}
-          <Link href="#" className="text-avalanche-red hover:underline">
+          <Link href="#" className="text-primary hover:text-primary-hover transition-colors">
             Contact Sales
           </Link>
         </p>
