@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { Shield, ArrowRight, Menu, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-// Esfera de partículas 3D densa
-function DenseParticleSphere() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+// Efecto Squarespace: Nube de partículas tipo constelación
+function SquarespaceSphere() {
+  const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
     let animationId: number;
@@ -15,10 +14,7 @@ function DenseParticleSphere() {
 
     const animate = () => {
       const elapsed = (Date.now() - startTime) / 1000;
-      setRotation({
-        x: elapsed * 5,
-        y: elapsed * 8
-      });
+      setRotation(elapsed * 3); // Rotación muy lenta
       animationId = requestAnimationFrame(animate);
     };
 
@@ -26,100 +22,67 @@ function DenseParticleSphere() {
     return () => cancelAnimationFrame(animationId);
   }, []);
 
-  // Generar partículas distribuidas en esfera 3D
-  const generateParticles = (count: number, radius: number) => {
-    const particles = [];
+  // Generar 4000 partículas distribuidas en esfera
+  const particles = useMemo(() => {
+    const count = 4000;
+    const items = [];
+    
     for (let i = 0; i < count; i++) {
       // Distribución esférica uniforme
       const phi = Math.acos(-1 + (2 * i) / count);
       const theta = Math.sqrt(count * Math.PI) * phi;
-
+      
+      // Radio variable para efecto de nube dispersa
+      const radiusBase = 220;
+      const radiusVariation = (Math.random() - 0.5) * 80;
+      const radius = radiusBase + radiusVariation;
+      
       const x = radius * Math.cos(theta) * Math.sin(phi);
       const y = radius * Math.sin(theta) * Math.sin(phi);
       const z = radius * Math.cos(phi);
-
-      particles.push({ x, y, z, id: i });
+      
+      // Opacidad aleatoria para efecto de profundidad
+      const opacity = 0.3 + Math.random() * 0.7;
+      
+      items.push({ x, y, z, opacity, id: i });
     }
-    return particles;
-  };
-
-  // Múltiples capas de partículas
-  const layers = [
-    { count: 400, radius: 150, size: 2, opacity: 0.8 },
-    { count: 300, radius: 130, size: 1.5, opacity: 0.6 },
-    { count: 250, radius: 170, size: 1.5, opacity: 0.5 },
-    { count: 200, radius: 110, size: 1, opacity: 0.4 },
-    { count: 150, radius: 190, size: 1, opacity: 0.3 },
-    { count: 100, radius: 90, size: 1, opacity: 0.5 },
-    { count: 80, radius: 210, size: 1, opacity: 0.25 },
-  ];
-
-  const allParticles = layers.flatMap((layer, layerIndex) => {
-    const particles = generateParticles(layer.count, layer.radius);
-    return particles.map(p => ({
-      ...p,
-      layer: layerIndex,
-      size: layer.size,
-      opacity: layer.opacity,
-    }));
-  });
+    return items;
+  }, []);
 
   return (
     <div 
-      ref={containerRef}
-      className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] lg:w-[550px] lg:h-[550px]"
-      style={{ perspective: '1000px' }}
+      className="relative w-[450px] h-[450px] sm:w-[550px] sm:h-[550px] lg:w-[650px] lg:h-[650px]"
+      style={{ perspective: '1200px' }}
     >
       <div
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute inset-0"
         style={{
-          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transform: `rotateX(${rotation * 0.5}deg) rotateY(${rotation}deg) rotateZ(${rotation * 0.3}deg)`,
           transformStyle: 'preserve-3d',
-          transition: 'transform 0.1s linear',
+          transition: 'transform 0.05s linear',
         }}
       >
-        {allParticles.map((particle) => {
-          // Proyección 3D a 2D con profundidad
-          const scale = 1 + (particle.z / 300);
-          const opacity = particle.opacity * (0.5 + (particle.z + 150) / 300);
+        {particles.map((particle) => {
+          // Calcular escala basada en profundidad (z)
+          const scale = 0.6 + ((particle.z + 250) / 500) * 0.6;
+          const finalOpacity = particle.opacity * scale;
           
           return (
             <div
-              key={`${particle.layer}-${particle.id}`}
+              key={particle.id}
               className="absolute rounded-full bg-white"
               style={{
-                width: `${particle.size * (0.8 + Math.random() * 0.4)}px`,
-                height: `${particle.size * (0.8 + Math.random() * 0.4)}px`,
+                width: '1.5px',
+                height: '1.5px',
                 left: `calc(50% + ${particle.x}px)`,
                 top: `calc(50% + ${particle.y}px)`,
-                opacity: Math.max(0.1, Math.min(1, opacity)),
-                transform: `translate(-50%, -50%) scale(${scale})`,
+                opacity: finalOpacity,
+                transform: `translate(-50%, -50%)`,
               }}
             />
           );
         })}
       </div>
-
-      {/* Líneas conectoras sutiles */}
-      <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-10"
-        style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` }}
-      >
-        {allParticles.slice(0, 50).map((p1, i) => {
-          const p2 = allParticles[(i + 1) % allParticles.length];
-          return (
-            <line
-              key={`line-${i}`}
-              x1={`${50 + (p1.x / 250) * 50}%`}
-              y1={`${50 + (p1.y / 250) * 50}%`}
-              x2={`${50 + (p2.x / 250) * 50}%`}
-              y2={`${50 + (p2.y / 250) * 50}%`}
-              stroke="white"
-              strokeWidth="0.5"
-            />
-          );
-        })}
-      </svg>
     </div>
   );
 }
@@ -187,7 +150,7 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* Hero Section - Full Height */}
+      {/* Hero Section */}
       <section className="min-h-screen flex items-center pt-16 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -242,9 +205,9 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right Visual - Dense Particle Sphere */}
+            {/* Right Visual - Squarespace Style Sphere */}
             <div className={`flex items-center justify-center transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <DenseParticleSphere />
+              <SquarespaceSphere />
             </div>
           </div>
         </div>
