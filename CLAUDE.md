@@ -70,21 +70,46 @@
 
 ## 🛠️ Commands
 
-### Backend
+### 🚀 Development (One Command for Everything)
 ```bash
-cd backend
-npm install
-npm run dev          # Starts on http://localhost:3001
-npm run build        # Compile TypeScript
-npm start            # Production mode
+# From project root - starts BOTH backend and frontend
+npm run dev
+
+# Backend only
+npm run dev:backend  # http://localhost:3001
+
+# Frontend only
+npm run dev:frontend # http://localhost:3000
 ```
 
-### Frontend
+### 📦 Installation
 ```bash
-cd frontend
-npm install
-npm run dev          # Starts on http://localhost:3000
-npm run build        # Production build
+# Install all dependencies (root + backend + frontend)
+npm run install:all
+
+# Or manually:
+npm install              # Root dependencies (concurrently)
+cd backend && npm install
+cd frontend && npm install
+```
+
+### 🏗️ Build
+```bash
+# Build everything
+npm run build
+
+# Build specific
+npm run build:backend
+npm run build:frontend
+```
+
+### 🧹 Maintenance
+```bash
+# Clean all node_modules and build files
+npm run clean
+
+# Lint everything
+npm run lint
 ```
 
 ### Testing API
@@ -252,20 +277,20 @@ pacto/
 
 ## 📝 Last Commit Log
 
-**Latest Commit:** `ce4b5e3`
+**Latest Commit:** `a2e044ef6`
 **Branch:** main
-**Status:** Frontend redesign with Core.app dark theme done
+**Status:** Monorepo unified + security fixes + docs complete
 **Changes:**
-- Complete UI redesign (globals.css, tailwind.config)
-- Landing page, login, dashboard dark theme
-- API integration working
-- Push pending due to node_modules
+- ✅ Root package.json with `concurrently` - single `npm run dev` command
+- ✅ CLAUDE.md and TOOLS.md documentation
+- ✅ Security: API key validation, rate limiting, input sanitization
+- ✅ Copy improvements: "See What Banks Miss. Lend with Confidence."
 
 **Next Actions:**
-1. Fix git push (remove node_modules)
-2. Deploy contracts to Fuji
+1. Test unified dev command (`npm run dev`)
+2. Deploy contracts to Fuji Testnet
 3. Record video demo
-4. Submit to hackathon
+4. Submit hackathon
 
 ---
 
