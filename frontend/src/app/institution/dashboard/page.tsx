@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Users, TrendingUp, Wallet, Search, Filter, ArrowRight,
   CheckCircle, AlertCircle, Activity, BarChart3, PieChart,
-  Shield, Loader2, Menu, X
+  Shield, Loader2, Menu, X, Download, ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import { apiClient } from "@/lib/api";
@@ -40,7 +40,7 @@ export default function InstitutionDashboard() {
   const [error, setError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Mock data for demo purposes when backend is not available
+  // Mock data for demo purposes
   const mockPymes: Pyme[] = [
     { id: "1", name: "Distribuidora del Norte", wallet: "0x742d35...", score: 847, risk: "low", volume: 1250000, transactions: 47, status: "active" },
     { id: "2", name: "Comercializadora Juárez", wallet: "0x8ba1f1...", score: 723, risk: "low", volume: 890000, transactions: 32, status: "active" },
@@ -96,25 +96,25 @@ export default function InstitutionDashboard() {
 
   const getRiskBadge = (risk: string) => {
     switch(risk) {
-      case "low": return <span className="badge-green text-xs">Low Risk</span>;
-      case "medium": return <span className="badge-yellow text-xs">Medium</span>;
-      case "high": return <span className="badge-red text-xs">High Risk</span>;
-      default: return <span className="text-[#71717A] text-xs">{risk}</span>;
+      case "low": return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white/80 border border-white/20">Low Risk</span>;
+      case "medium": return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white/60 border border-white/20">Medium</span>;
+      case "high": return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white/40 border border-white/20">High Risk</span>;
+      default: return <span className="text-white/40 text-xs">{risk}</span>;
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 750) return "text-[#3DD598]";
-    if (score >= 600) return "text-[#FFC542]";
-    return "text-[#FF6B6B]";
+    if (score >= 750) return "text-white";
+    if (score >= 600) return "text-white/70";
+    return "text-white/50";
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0F0F10] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-3" />
-          <p className="text-[#71717A] text-sm">Loading dashboard...</p>
+          <p className="text-white/40 text-sm">Loading PACTO Dashboard...</p>
         </div>
       </div>
     );
@@ -122,14 +122,14 @@ export default function InstitutionDashboard() {
 
   if (error && pymes.length === 0 && !stats) {
     return (
-      <div className="min-h-screen bg-[#0F0F10] flex items-center justify-center">
-        <div className="text-center p-8 bg-[#18181B] rounded-lg border border-[#27272A] max-w-md mx-4">
-          <AlertCircle className="w-12 h-12 text-[#FF6B6B] mx-auto mb-4" />
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+        <div className="text-center p-8 bg-white/[0.02] rounded-2xl border border-white/10 max-w-md mx-4">
+          <AlertCircle className="w-12 h-12 text-white/40 mx-auto mb-4" />
           <p className="text-white font-medium mb-2">Error loading dashboard</p>
-          <p className="text-[#71717A] text-sm">{error}</p>
+          <p className="text-white/40 text-sm">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="btn mt-6"
+            className="mt-6 px-6 py-3 bg-white text-black font-medium rounded-full hover:bg-white/90 transition-all"
           >
             Retry
           </button>
@@ -139,44 +139,42 @@ export default function InstitutionDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F10]">
+    <div className="min-h-screen bg-[#0A0A0B]">
       {/* Header */}
-      <header className="border-b border-[#27272A] sticky top-0 z-50 bg-[#0F0F10]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="flex justify-between items-center h-14">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0B]/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   <Shield className="w-4 h-4 text-black" />
                 </div>
-                <span className="text-white font-semibold text-sm">PACTO</span>
+                <span className="text-white font-bold text-lg">PACTO</span>
               </Link>
-              <div className="hidden sm:block h-4 w-px bg-[#27272A]" />
-              <div className="hidden sm:flex items-center gap-2 text-[#71717A]">
+              <div className="hidden sm:block h-6 w-px bg-white/10" />
+              <div className="hidden sm:flex items-center gap-2 text-white/50">
                 <Wallet className="w-4 h-4" />
-                <span className="text-xs">Banco del Sur</span>
+                <span className="text-sm">Banco del Sur</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#3DD598]/10 border border-[#3DD598]/20">
-                <div className="w-1.5 h-1.5 bg-[#3DD598] rounded-full animate-pulse" />
-                <span className="text-[#3DD598] text-xs font-medium">Demo Mode</span>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                <span className="text-white/70 text-xs font-medium">Live Demo</span>
               </div>
               
-              {/* Mobile Menu Button */}
               <button 
-                className="md:hidden p-2 text-[#A1A1AA] hover:text-white"
+                className="md:hidden p-2 text-white/60 hover:text-white"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Nav */}
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-[#27272A]">
+            <div className="md:hidden py-4 border-t border-white/10">
               <nav className="flex flex-col gap-2">
                 {[
                   { id: "overview", label: "Overview", icon: Activity },
@@ -191,8 +189,8 @@ export default function InstitutionDashboard() {
                     }}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                       activeTab === tab.id 
-                        ? "text-white bg-[#18181B]" 
-                        : "text-[#71717A] hover:text-white"
+                        ? "text-white bg-white/5" 
+                        : "text-white/50 hover:text-white"
                     }`}
                   >
                     <tab.icon className="w-4 h-4" />
@@ -206,21 +204,21 @@ export default function InstitutionDashboard() {
       </header>
 
       {/* Navigation - Desktop */}
-      <nav className="hidden md:block border-b border-[#27272A]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <nav className="hidden md:block fixed top-16 left-0 right-0 z-40 bg-[#0A0A0B]/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1">
             {[
               { id: "overview", label: "Overview", icon: Activity },
-              { id: "pymes", label: "PYMEs", icon: Users },
-              { id: "analytics", label: "Analytics", icon: BarChart3 },
+              { id: "pymes", label: "PYME Portfolio", icon: Users },
+              { id: "analytics", label: "Risk Analytics", icon: BarChart3 },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 ${
+                className={`flex items-center gap-2 px-4 py-4 text-sm font-medium transition-all border-b-2 ${
                   activeTab === tab.id 
                     ? "text-white border-white" 
-                    : "text-[#71717A] border-transparent hover:text-white"
+                    : "text-white/50 border-transparent hover:text-white"
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -231,81 +229,181 @@ export default function InstitutionDashboard() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main className="pt-32 pb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {activeTab === "overview" && stats && (
           <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#27272A] rounded-lg overflow-hidden mb-6">
-              <div className="bg-[#0F0F10] p-4 sm:p-5">
-                <p className="text-small mb-1">Total PYMEs</p>
-                <p className="text-xl sm:text-2xl font-semibold text-white">{stats.totalPymes}</p>
-                <p className="text-[#3DD598] text-xs mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  +12%
-                </p>
-              </div>
-
-              <div className="bg-[#0F0F10] p-4 sm:p-5">
-                <p className="text-small mb-1">Total Volume</p>
-                <p className="text-xl sm:text-2xl font-semibold text-white">${(stats.totalVolume / 1000000).toFixed(1)}M</p>
-                <p className="text-[#3DD598] text-xs mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  +23%
-                </p>
-              </div>
-
-              <div className="bg-[#0F0F10] p-4 sm:p-5">
-                <p className="text-small mb-1">Avg Score</p>
-                <p className="text-xl sm:text-2xl font-semibold text-white">{stats.avgScore}</p>
-                <p className="text-[#71717A] text-xs mt-1">Stable</p>
-              </div>
-
-              <div className="bg-[#0F0F10] p-4 sm:p-5">
-                <p className="text-small mb-1">Low Risk</p>
-                <p className="text-xl sm:text-2xl font-semibold text-white">{stats.lowRisk}</p>
-                <p className="text-[#71717A] text-xs mt-1">of {stats.totalPymes}</p>
-              </div>
+            {/* Welcome Section */}
+            <div className="mb-8">
+              <p className="text-white/40 text-sm font-mono mb-2">DASHBOARD OVERVIEW</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                Welcome back, <span className="italic font-serif text-white/70">Banco del Sur</span>
+              </h1>
+              <p className="text-white/50">
+                Here's what's happening with your PYME portfolio today.
+              </p>
             </div>
 
-            {/* PYMEs Table */}
-            <div className="card overflow-hidden">
-              <div className="p-4 sm:p-5 border-b border-[#27272A] flex justify-between items-center">
-                <h2 className="title-md text-base">Top PYMEs by Volume</h2>
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {[
+                { label: "Total PYMEs", value: stats.totalPymes, change: "+12%", icon: Users },
+                { label: "Portfolio Volume", value: `$${(stats.totalVolume / 1000000).toFixed(1)}M`, change: "+23%", icon: Wallet },
+                { label: "Average Score", value: stats.avgScore, change: "Stable", icon: TrendingUp },
+                { label: "Low Risk", value: stats.lowRisk, change: `of ${stats.totalPymes}`, icon: CheckCircle },
+              ].map((stat, idx) => (
+                <div key={idx} className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all">
+                  <div className="flex items-center justify-between mb-4">
+                    <stat.icon className="w-5 h-5 text-white/40" />
+                    <span className="text-white/30 text-xs">{stat.change}</span>
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stat.value}</p>
+                  <p className="text-white/50 text-sm">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Top PYMEs Section */}
+            <div className="rounded-2xl bg-white/[0.02] border border-white/10 overflow-hidden">
+              <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-white mb-1">Top Performing PYMEs</h2>
+                  <p className="text-white/50 text-sm">Highest volume businesses in your portfolio</p>
+                </div>
                 <button 
                   onClick={() => setActiveTab("pymes")}
-                  className="text-white hover:underline text-xs sm:text-sm flex items-center gap-1"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-full transition-all border border-white/10"
                 >
-                  View all
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                  View All
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[500px]">
-                  <thead className="bg-[#18181B]">
+                <table className="w-full">
+                  <thead className="bg-white/[0.02]">
                     <tr>
-                      <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">PYME</th>
-                      <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">Score</th>
-                      <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">Risk</th>
-                      <th className="px-4 sm:px-5 py-3 text-right text-xs font-medium text-[#71717A] uppercase">Volume</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">Business</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">PACTO Score</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">Risk Level</th>
+                      <th className="px-6 py-4 text-right text-xs font-medium text-white/40 uppercase">Volume</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27272A]">
+                  <tbody className="divide-y divide-white/5">
                     {pymes.slice(0, 5).map((pyme) => (
-                      <tr key={pyme.id} className="hover:bg-[#18181B]/50 transition-colors">
-                        <td className="px-4 sm:px-5 py-3">
+                      <tr key={pyme.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="px-6 py-4">
                           <div>
-                            <p className="font-medium text-white text-sm">{pyme.name}</p>
-                            <p className="text-xs text-[#71717A] font-mono">{pyme.wallet}</p>
+                            <p className="font-medium text-white">{pyme.name}</p>
+                            <p className="text-sm text-white/30 font-mono">{pyme.wallet}</p>
                           </div>
                         </td>
-                        <td className="px-4 sm:px-5 py-3">
-                          <span className={`text-lg sm:text-xl font-semibold ${getScoreColor(pyme.score)}`}>
+                        <td className="px-6 py-4">
+                          <span className={`text-2xl font-bold ${getScoreColor(pyme.score)}`}>
                             {pyme.score}
                           </span>
                         </td>
-                        <td className="px-4 sm:px-5 py-3">{getRiskBadge(pyme.risk)}</td>
-                        <td className="px-4 sm:px-5 py-3 text-right font-medium text-white text-sm">
-                          ${pyme.volume.toLocaleString()}
+                        <td className="px-6 py-4">{getRiskBadge(pyme.risk)}</td>
+                        <td className="px-6 py-4 text-right">
+                          <p className="font-medium text-white">${pyme.volume.toLocaleString()}</p>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { title: "Export Report", desc: "Download portfolio analytics", icon: Download },
+                { title: "New Assessment", desc: "Score a new business", icon: TrendingUp },
+                { title: "API Documentation", desc: "Integrate with your systems", icon: Activity },
+              ].map((action, idx) => (
+                <button key={idx} className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all text-left group">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <action.icon className="w-5 h-5 text-white/60" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-1">{action.title}</h3>
+                  <p className="text-white/40 text-sm">{action.desc}</p>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {activeTab === "pymes" && (
+          <>
+            <div className="mb-8">
+              <p className="text-white/40 text-sm font-mono mb-2">PYME PORTFOLIO</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                All <span className="italic font-serif text-white/70">Businesses</span>
+              </h1>
+              <p className="text-white/50">
+                Complete view of your PYME portfolio with PACTO Scores.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white/[0.02] border border-white/10 overflow-hidden">
+              <div className="p-6 border-b border-white/10">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                    <input
+                      type="text"
+                      placeholder="Search businesses..."
+                      value={searchQuery}
+                      maxLength={100}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-all"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-xl transition-all border border-white/10 flex items-center gap-2">
+                      <Filter className="w-4 h-4" />
+                      Filters
+                    </button>
+                    <button className="px-4 py-3 bg-white text-black text-sm font-medium rounded-xl hover:bg-white/90 transition-all flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/[0.02]">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">Business</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">Score</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-white/40 uppercase">Risk</th>
+                      <th className="px-6 py-4 text-right text-xs font-medium text-white/40 uppercase">Volume</th>
+                      <th className="px-6 py-4 text-center text-xs font-medium text-white/40 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {filteredPymes.map((pyme) => (
+                      <tr key={pyme.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="px-6 py-4">
+                          <p className="font-medium text-white">{pyme.name}</p>
+                          <p className="text-sm text-white/30 font-mono">{pyme.wallet}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`text-2xl font-bold ${getScoreColor(pyme.score)}`}>
+                            {pyme.score}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">{getRiskBadge(pyme.risk)}</td>
+                        <td className="px-6 py-4 text-right">
+                          <p className="font-medium text-white">${pyme.volume.toLocaleString()}</p>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            pyme.status === 'active' 
+                              ? 'bg-white/10 text-white border border-white/20' 
+                              : 'bg-white/5 text-white/60 border border-white/10'
+                          }`}>
+                            {pyme.status}
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -316,113 +414,62 @@ export default function InstitutionDashboard() {
           </>
         )}
 
-        {activeTab === "pymes" && (
-          <div className="card overflow-hidden">
-            <div className="p-4 sm:p-5 border-b border-[#27272A]">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <h2 className="title-md text-base">All PYMEs</h2>
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <div className="relative flex-1 sm:flex-none">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#71717A]" />
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      value={searchQuery}
-                      maxLength={100}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="input pl-9 w-full sm:w-48 text-sm"
-                    />
-                  </div>
-                  <button className="btn-secondary px-3">
-                    <Filter className="w-4 h-4" />
-                  </button>
+        {activeTab === "analytics" && stats && (
+          <>
+            <div className="mb-8">
+              <p className="text-white/40 text-sm font-mono mb-2">RISK ANALYTICS</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                Portfolio <span className="italic font-serif text-white/70">Insights</span>
+              </h1>
+              <p className="text-white/50">
+                Deep analytics on your PYME portfolio risk distribution.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-6">Risk Distribution</h3>
+                <div className="space-y-6">
+                  {[
+                    { label: "Low Risk", value: stats.lowRisk, total: stats.totalPymes },
+                    { label: "Medium Risk", value: stats.mediumRisk, total: stats.totalPymes },
+                    { label: "High Risk", value: stats.highRisk, total: stats.totalPymes },
+                  ].map((item) => (
+                    <div key={item.label}>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-white/60">{item.label}</span>
+                        <span className="text-white font-medium">{item.value} ({Math.round((item.value / item.total) * 100)}%)</span>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-2">
+                        <div className="h-full bg-white rounded-full transition-all" style={{width: `${(item.value / item.total) * 100}%`}}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-6">Score Distribution</h3>
+                <div className="flex items-end justify-between h-48 gap-4">
+                  {[
+                    { label: "500-600", value: pymes.filter(p => p.score >= 500 && p.score < 600).length },
+                    { label: "600-700", value: pymes.filter(p => p.score >= 600 && p.score < 700).length },
+                    { label: "700-800", value: pymes.filter(p => p.score >= 700 && p.score < 800).length },
+                    { label: "800+", value: pymes.filter(p => p.score >= 800).length },
+                  ].map((bar) => (
+                    <div key={bar.label} className="flex-1 flex flex-col items-center">
+                      <div className="text-white font-bold mb-2">{bar.value}</div>
+                      <div 
+                        className="w-full bg-white/20 rounded-t transition-all"
+                        style={{height: `${Math.max(bar.value * 20, 8)}px`}}
+                      ></div>
+                      <p className="text-white/40 text-xs mt-2 text-center">{bar.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
-                <thead className="bg-[#18181B]">
-                  <tr>
-                    <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">PYME</th>
-                    <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">Score</th>
-                    <th className="px-4 sm:px-5 py-3 text-left text-xs font-medium text-[#71717A] uppercase">Risk</th>
-                    <th className="px-4 sm:px-5 py-3 text-right text-xs font-medium text-[#71717A] uppercase">Volume</th>
-                    <th className="px-4 sm:px-5 py-3 text-center text-xs font-medium text-[#71717A] uppercase">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#27272A]">
-                  {filteredPymes.map((pyme) => (
-                    <tr key={pyme.id} className="hover:bg-[#18181B]/50 transition-colors">
-                      <td className="px-4 sm:px-5 py-3">
-                        <p className="font-medium text-white text-sm">{pyme.name}</p>
-                        <p className="text-xs text-[#71717A] font-mono">{pyme.wallet}</p>
-                      </td>
-                      <td className="px-4 sm:px-5 py-3">
-                        <span className={`text-lg font-semibold ${getScoreColor(pyme.score)}`}>
-                          {pyme.score}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-5 py-3">{getRiskBadge(pyme.risk)}</td>
-                      <td className="px-4 sm:px-5 py-3 text-right font-medium text-white text-sm">
-                        ${pyme.volume.toLocaleString()}
-                      </td>
-                      <td className="px-4 sm:px-5 py-3 text-center">
-                        <span className={`badge-${pyme.status === 'active' ? 'green' : 'yellow'} text-xs`}>
-                          {pyme.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "analytics" && stats && (
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
-            <div className="card p-5 sm:p-6">
-              <h3 className="title-md mb-5 text-base">Risk Distribution</h3>
-              <div className="space-y-4">
-                {[
-                  { label: "Low Risk", value: stats.lowRisk, total: stats.totalPymes, color: "bg-[#3DD598]" },
-                  { label: "Medium Risk", value: stats.mediumRisk, total: stats.totalPymes, color: "bg-[#FFC542]" },
-                  { label: "High Risk", value: stats.highRisk, total: stats.totalPymes, color: "bg-[#FF6B6B]" },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-[#71717A] text-xs">{item.label}</span>
-                      <span className="text-white text-xs font-medium">{item.value} ({Math.round((item.value / item.total) * 100)}%)</span>
-                    </div>
-                    <div className="w-full bg-[#18181B] rounded-full h-1.5">
-                      <div className={`${item.color} h-1.5 rounded-full`} style={{width: `${(item.value / item.total) * 100}%`}}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="card p-5 sm:p-6">
-              <h3 className="title-md mb-5 text-base">Score Distribution</h3>
-              <div className="flex items-end justify-between h-40 gap-2 sm:gap-3">
-                {[
-                  { label: "500-600", value: pymes.filter(p => p.score >= 500 && p.score < 600).length },
-                  { label: "600-700", value: pymes.filter(p => p.score >= 600 && p.score < 700).length },
-                  { label: "700-800", value: pymes.filter(p => p.score >= 700 && p.score < 800).length },
-                  { label: "800+", value: pymes.filter(p => p.score >= 800).length },
-                ].map((bar) => (
-                  <div key={bar.label} className="flex-1 flex flex-col items-center">
-                    <div className="text-white font-semibold mb-1 text-sm">{bar.value}</div>
-                    <div 
-                      className="w-full bg-white rounded-t transition-all"
-                      style={{height: `${Math.max(bar.value * 10, 4)}px`}}
-                    ></div>
-                    <p className="text-[#71717A] text-xs mt-2 text-center">{bar.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          </>
         )}
       </main>
     </div>
