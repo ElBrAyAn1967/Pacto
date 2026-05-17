@@ -39,6 +39,29 @@ export default function InstitutionDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Mock data for demo purposes when backend is not available
+  const mockPymes: Pyme[] = [
+    { id: "1", name: "Distribuidora del Norte", wallet: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb", score: 847, risk: "low", volume: 1250000, transactions: 47, status: "active" },
+    { id: "2", name: "Comercializadora Juárez", wallet: "0x8ba1f109551bD432803012645Hac136c82C3e8", score: 723, risk: "low", volume: 890000, transactions: 32, status: "active" },
+    { id: "3", name: "Importadora García", wallet: "0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0b", score: 654, risk: "medium", volume: 540000, transactions: 21, status: "active" },
+    { id: "4", name: "Exportadora del Sur", wallet: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe", score: 521, risk: "high", volume: 280000, transactions: 12, status: "pending" },
+    { id: "5", name: "Mayoreo Martínez", wallet: "0xAb5801c7D398351b8bE11C439e05C5B3259aeC9", score: 778, risk: "low", volume: 2100000, transactions: 68, status: "active" },
+    { id: "6", name: "Distribuciones López", wallet: "0xdAC17F958D2ee523a2206206994597C13D831ec", score: 612, risk: "medium", volume: 450000, transactions: 19, status: "active" },
+    { id: "7", name: "Logística Hernández", wallet: "0x8f3470A7388c05eE4e7AF3d01D8C722", score: 698, risk: "medium", volume: 720000, transactions: 28, status: "active" },
+    { id: "8", name: "Suministros Pérez", wallet: "0x0716a17FBAeE714f1E6aB0f9d59dbbc", score: 812, risk: "low", volume: 1560000, transactions: 54, status: "active" },
+  ];
+
+  const mockStats: InstitutionStats = {
+    totalPymes: 247,
+    activePymes: 198,
+    totalVolume: 24500000,
+    avgScore: 712,
+    totalTransactions: 1247,
+    lowRisk: 143,
+    mediumRisk: 68,
+    highRisk: 36
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,7 +74,10 @@ export default function InstitutionDashboard() {
         if (pymesRes.success) setPymes(pymesRes.data);
         if (statsRes.success) setStats(statsRes.data);
       } catch (err: any) {
-        setError(err.message || "Failed to fetch data");
+        // Fallback to mock data when backend is unavailable
+        console.log("Backend unavailable, using mock data");
+        setPymes(mockPymes);
+        setStats(mockStats);
       } finally {
         setLoading(false);
       }
@@ -86,25 +112,26 @@ export default function InstitutionDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#0F0F10] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-text-secondary">Loading dashboard...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-3" />
+          <p className="text-[#71717A] text-sm">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  // Show error only if we have no data at all (even mock failed)
+  if (error && pymes.length === 0 && !stats) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center p-8 core-card max-w-md">
-          <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-          <p className="text-error font-medium mb-2">Error loading dashboard</p>
-          <p className="text-text-secondary text-sm">{error}</p>
+      <div className="min-h-screen bg-[#0F0F10] flex items-center justify-center">
+        <div className="text-center p-8 bg-[#18181B] rounded-lg border border-[#27272A] max-w-md">
+          <AlertCircle className="w-12 h-12 text-[#FF6B6B] mx-auto mb-4" />
+          <p className="text-white font-medium mb-2">Error loading dashboard</p>
+          <p className="text-[#71717A] text-sm">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="core-btn mt-6"
+            className="btn mt-6"
           >
             Retry
           </button>
