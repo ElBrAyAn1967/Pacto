@@ -50,17 +50,17 @@ export default function NewTransaction() {
     }
 
     try {
-      const result = await registerTransaction(
+      await registerTransaction(
         formData.counterparty,
         formData.amount,
         formData.currency,
         formData.description
       );
       
-      if (result) {
-        setTxHash(result);
-        setSubmitted(true);
-      }
+      // Transaction submitted successfully
+      // Note: Actual tx hash comes from useWriteContract's data property
+      // For now, we show success without the hash (will be improved)
+      setSubmitted(true);
     } catch (err) {
       setError("Error al registrar la transacción. Intenta de nuevo.");
       console.error(err);
