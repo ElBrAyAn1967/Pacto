@@ -1,8 +1,89 @@
 'use client';
 
 import Link from "next/link";
-import { Shield, ArrowRight, Menu, X, Globe, Network, Zap, Check, ChevronRight, BarChart3, Lock, Users, TrendingUp } from "lucide-react";
+import { Shield, ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+
+// Componente de Esfera de Partículas
+function ParticleSphere() {
+  // Generar múltiples anillos de partículas
+  const rings = [
+    { count: 30, radius: 100, speed: 20, delay: 0 },
+    { count: 40, radius: 140, speed: 25, delay: 2 },
+    { count: 50, radius: 180, speed: 30, delay: 4 },
+    { count: 35, radius: 130, speed: 22, delay: 1, rotateX: 60 },
+    { count: 45, radius: 160, speed: 28, delay: 3, rotateX: 45 },
+    { count: 55, radius: 200, speed: 35, delay: 5, rotateX: 30 },
+  ];
+
+  return (
+    <div className="relative w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px]">
+      {rings.map((ring, ringIndex) => (
+        <div
+          key={ringIndex}
+          className="absolute inset-0 flex items-center justify-center"
+          style={{
+            transform: ring.rotateX ? `rotateX(${ring.rotateX}deg)` : 'rotateX(75deg)',
+          }}
+        >
+          <div
+            className="absolute"
+            style={{
+              width: `${ring.radius * 2}px`,
+              height: `${ring.radius * 2}px`,
+              animation: `rotate ${ring.speed}s linear infinite`,
+              animationDelay: `${ring.delay}s`,
+            }}
+          >
+            {Array.from({ length: ring.count }).map((_, i) => {
+              const angle = (i / ring.count) * 360;
+              return (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full"
+                  style={{
+                    top: `${50 + 50 * Math.sin((angle * Math.PI) / 180)}%`,
+                    left: `${50 + 50 * Math.cos((angle * Math.PI) / 180)}%`,
+                    transform: 'translate(-50%, -50%)',
+                    opacity: 0.6 + Math.random() * 0.4,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      
+      {/* Partículas adicionales en el centro */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {Array.from({ length: 100 }).map((_, i) => (
+          <div
+            key={`center-${i}`}
+            className="absolute w-0.5 h-0.5 bg-white rounded-full"
+            style={{
+              top: `${40 + Math.random() * 20}%`,
+              left: `${40 + Math.random() * 20}%`,
+              opacity: 0.3 + Math.random() * 0.5,
+              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px); }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -67,7 +148,7 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Full Height */}
       <section className="min-h-screen flex items-center pt-16 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -81,7 +162,10 @@ export default function Landing() {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6">
                 The credit scoring{' '}
                 <span className="italic font-serif text-white/80">infrastructure</span>{' '}
-                for LATAM's invisible economy
+                <br className="hidden sm:block" />
+                for LATAM's{' '}
+                <span className="italic font-serif text-white/80">invisible</span>{' '}
+                economy
               </h1>
 
               <p className="text-lg sm:text-xl text-white/50 mb-8 max-w-lg leading-relaxed">
@@ -101,7 +185,7 @@ export default function Landing() {
                   className="inline-flex items-center justify-center gap-2 px-6 py-4 text-white/60 hover:text-white font-medium transition-colors text-base"
                 >
                   See How It Works
-                  <ChevronRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
 
@@ -119,46 +203,15 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right Visual */}
-            <div className={`relative h-[400px] sm:h-[500px] lg:h-[600px] transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px]">
-                  <div className="absolute inset-0 border-2 border-dashed border-white/10 rounded-full animate-spin" style={{ animationDuration: '30s' }} />
-                  <div className="absolute inset-8 border border-white/20 rounded-full" />
-                  <div className="absolute inset-16 rounded-full bg-white/5 blur-xl" />
-                  <div className="absolute inset-24 rounded-full bg-[#0A0A0B] border border-white/30 flex items-center justify-center">
-                    <Globe className="w-16 h-16 sm:w-20 sm:h-20 text-white/60" />
-                  </div>
-
-                  {[
-                    { angle: 0, icon: Network },
-                    { angle: 90, icon: Zap },
-                    { angle: 180, icon: Shield },
-                    { angle: 270, icon: BarChart3 },
-                  ].map((node, idx) => (
-                    <div
-                      key={idx}
-                      className="absolute w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 border border-white/20"
-                      style={{
-                        top: `${50 + 45 * Math.sin((node.angle * Math.PI) / 180)}%`,
-                        left: `${50 + 45 * Math.cos((node.angle * Math.PI) / 180)}%`,
-                        transform: 'translate(-50%, -50%)',
-                      }}
-                    >
-                      <node.icon className="w-6 h-6 text-white/70" />
-                    </div>
-                  ))}
-
-                  <svg className="absolute inset-0 w-full h-full">
-                    <line x1="50%" y1="50%" x2="95%" y2="50%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 4" />
-                    <line x1="50%" y1="50%" x2="50%" y2="95%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 4" />
-                    <line x1="50%" y1="50%" x2="5%" y2="50%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 4" />
-                    <line x1="50%" y1="50%" x2="50%" y2="5%" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 4" />
-                  </svg>
-                </div>
-              </div>
+            {/* Right Visual - Particle Sphere */}
+            <div className={`flex items-center justify-center transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <ParticleSphere />
             </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <ArrowRight className="w-5 h-5 text-white/20 rotate-90" />
         </div>
       </section>
 
@@ -232,28 +285,22 @@ export default function Landing() {
                 step: "01", 
                 title: "Connect", 
                 desc: "Banks integrate PACTO via API. Query any business wallet or identifier for instant credit assessment.",
-                icon: Network,
                 time: "5 min integration"
               },
               { 
                 step: "02", 
                 title: "Analyze", 
                 desc: "Our algorithm processes 50+ signals: transaction history, supplier networks, on-chain reputation, and behavioral patterns.",
-                icon: BarChart3,
                 time: "<100ms response"
               },
               { 
                 step: "03", 
                 title: "Decide", 
                 desc: "Receive PACTO Score (0-1000), risk classification, recommended credit limit, and optimal interest rate.",
-                icon: Check,
                 time: "Instant decision"
               },
             ].map((item, idx) => (
               <div key={idx} className="group p-8 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-white/30 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <item.icon className="w-6 h-6 text-white/70" />
-                </div>
                 <p className="text-white/30 text-sm font-mono mb-2">{item.step}</p>
                 <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
                 <p className="text-white/50 leading-relaxed mb-4">{item.desc}</p>
@@ -282,31 +329,13 @@ export default function Landing() {
 
               <div className="space-y-6">
                 {[
-                  { 
-                    icon: Lock, 
-                    title: "Immutable Reputation",
-                    desc: "Credit scores stored on-chain. Tamper-proof history."
-                  },
-                  { 
-                    icon: Zap, 
-                    title: "Sub-second Finality",
-                    desc: "Avalanche consensus delivers results in <100ms."
-                  },
-                  { 
-                    icon: Globe, 
-                    title: "Cross-border Ready",
-                    desc: "One score, valid across LATAM. Mexico to Argentina."
-                  },
-                  { 
-                    icon: TrendingUp, 
-                    title: "Transparent Scoring",
-                    desc: "Auditable algorithms. No black boxes."
-                  },
+                  { title: "Immutable Reputation", desc: "Credit scores stored on-chain. Tamper-proof history." },
+                  { title: "Sub-second Finality", desc: "Avalanche consensus delivers results in <100ms." },
+                  { title: "Cross-border Ready", desc: "One score, valid across LATAM. Mexico to Argentina." },
+                  { title: "Transparent Scoring", desc: "Auditable algorithms. No black boxes." },
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-white/70" />
-                    </div>
+                    <div className="w-2 h-2 rounded-full bg-white/40 mt-2 flex-shrink-0" />
                     <div>
                       <h4 className="text-white font-semibold mb-1">{item.title}</h4>
                       <p className="text-white/50 text-sm">{item.desc}</p>
@@ -325,7 +354,7 @@ export default function Landing() {
                   <span className="ml-2">api-request.js</span>
                 </div>
                 <pre className="text-white/60 overflow-x-auto">
-{`// Query PACTO Score
+{`// Get PACTO Score
 const response = await fetch(
   'https://api.pacto.io/v1/score/0x742d...',
   {
@@ -356,7 +385,7 @@ const { data } = await response.json();
         </div>
       </section>
 
-      {/* Traction/Social Proof */}
+      {/* Traction Section */}
       <section id="traction" className="py-24 sm:py-32 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -369,21 +398,9 @@ const { data } = await response.json();
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {[
-              { 
-                metric: "40%", 
-                label: "Lower Default Rates",
-                desc: "Compared to traditional credit scoring for thin-file borrowers"
-              },
-              { 
-                metric: "3x", 
-                label: "Faster Approvals",
-                desc: "From weeks to minutes. Real-time credit decisions."
-              },
-              { 
-                metric: "$2.4M", 
-                label: "Credit Facilitated",
-                desc: "In pilot programs with 3 regional banks in Mexico"
-              },
+              { metric: "40%", label: "Lower Default Rates", desc: "Compared to traditional credit scoring for thin-file borrowers" },
+              { metric: "3x", label: "Faster Approvals", desc: "From weeks to minutes. Real-time credit decisions." },
+              { metric: "$2.4M", label: "Credit Facilitated", desc: "In pilot programs with 3 regional banks in Mexico" },
             ].map((item, idx) => (
               <div key={idx} className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/10">
                 <p className="text-4xl sm:text-5xl font-bold text-white mb-3">{item.metric}</p>
@@ -393,7 +410,6 @@ const { data } = await response.json();
             ))}
           </div>
 
-          {/* Partner Logos Placeholder */}
           <div className="text-center">
             <p className="text-white/40 text-sm mb-8">Trusted by innovative financial institutions</p>
             <div className="flex flex-wrap justify-center gap-8 opacity-50">
@@ -485,26 +501,10 @@ const { data } = await response.json();
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { 
-                phase: "Q2 2026", 
-                title: "Beta Launch",
-                items: ["3 pilot banks in Mexico", "5,000 PYMEs onboarded", "$5M credit facilitated"]
-              },
-              { 
-                phase: "Q3 2026", 
-                title: "Regional Expansion",
-                items: ["Colombia & Chile launch", "Integration with 10+ fintechs", "AI scoring models"]
-              },
-              { 
-                phase: "Q4 2026", 
-                title: "Scale",
-                items: ["Full LATAM coverage", "100+ institutional clients", "$100M credit facilitated"]
-              },
-              { 
-                phase: "2027", 
-                title: "Platform",
-                items: ["Decentralized reputation", "Cross-chain support", "Insurance integration"]
-              },
+              { phase: "Q2 2026", title: "Beta Launch", items: ["3 pilot banks in Mexico", "5,000 PYMEs onboarded", "$5M credit facilitated"] },
+              { phase: "Q3 2026", title: "Regional Expansion", items: ["Colombia & Chile launch", "Integration with 10+ fintechs", "AI scoring models"] },
+              { phase: "Q4 2026", title: "Scale", items: ["Full LATAM coverage", "100+ institutional clients", "$100M credit facilitated"] },
+              { phase: "2027", title: "Platform", items: ["Decentralized reputation", "Cross-chain support", "Insurance integration"] },
             ].map((item, idx) => (
               <div key={idx} className="p-6 rounded-2xl bg-white/[0.02] border border-white/10">
                 <p className="text-white/30 text-sm font-mono mb-2">{item.phase}</p>
