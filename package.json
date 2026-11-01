@@ -44,5 +44,8 @@
     "web3"
   ],
   "author": "PACTO Team",
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "@coinbase/cdp-sdk": "1.49.2"
+  }
 }
